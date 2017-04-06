@@ -27,6 +27,7 @@ testListLazy = do
     nel xxs = NEL.NonEmptyList (Z.defer \_ -> xxs)
     longList = range 1 100000
 
+{-
   log "append should be stack-safe"
   assert $ length (longList <> longList) == (2 * length longList)
 
@@ -52,8 +53,10 @@ testListLazy = do
   log "unfoldable replicate should be lazy"
   assert $ head (U.replicate 10000000 unit) == Just unit
 
+-}
   log "traverse should be stack-safe"
   assert $ ((traverse Just longList) >>= last) == last longList
+{-
 
   log "bind should be stack-safe"
   void $ pure $ last $ longList >>= pure
@@ -361,6 +364,7 @@ testListLazy = do
   assert $ transpose nil == (nil :: List (List Int))
   log "transpose (singleton nil) == nil"
   assert $ transpose (singleton nil) == (nil :: List (List Int))
+-}
 
 nil' :: List Int
 nil' = nil

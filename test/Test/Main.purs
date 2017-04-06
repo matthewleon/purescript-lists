@@ -13,7 +13,7 @@ import Test.Data.List.ZipList (testZipList)
 
 main :: forall eff. Eff (assert :: ASSERT, console :: CONSOLE | eff) Unit
 main = do
-  testList
+--  testList
   testListLazy
-  testZipList
-  testListPartial
+--  testZipList
+--  testListPartial
