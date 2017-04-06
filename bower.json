@@ -20,7 +20,7 @@
     "package.json"
   ],
   "dependencies": {
-    "purescript-lazy": "^3.0.0",
+    "purescript-lazy": "matthewleon/purescript-lazy#constructorless",
     "purescript-nonempty": "^4.0.0",
     "purescript-tailrec": "^3.0.0",
     "purescript-unfoldable": "^3.0.0"
