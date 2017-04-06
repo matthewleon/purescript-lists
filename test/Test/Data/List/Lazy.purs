@@ -14,6 +14,7 @@ import Data.Monoid.Additive (Additive(..))
 import Data.NonEmpty ((:|))
 import Data.Traversable (traverse)
 import Data.Tuple (Tuple(..))
+import Data.Unfoldable as U
 
 import Partial.Unsafe (unsafePartial)
 
@@ -44,6 +45,13 @@ testListLazy = do
   log "foldMap should be left-to-right"
   assert $ foldMap show (range 1 5) == "12345"
 
+  log "unfoldr should be lazy"
+  let infiniteList = U.unfoldr (const $ Just (Tuple unit unit)) unit
+  assert $ head infiniteList == Just unit
+
+  log "unfoldable replicate should be lazy"
+  assert $ head (U.replicate 10000000 unit) == Just unit
+
   log "traverse should be stack-safe"
   assert $ ((traverse Just longList) >>= last) == last longList
 
@@ -68,6 +76,8 @@ testListLazy = do
   assert $ replicate 0 "foo" == l []
   assert $ replicate (-1) "foo" == l []
 
+  log "replicate should be lazy"
+  assert $ head (U.replicate 10000000 unit) == Just unit
   log "replicateM should perform the monadic action the correct number of times"
   assert $ replicateM 3 (Just 1) == Just (l [1, 1, 1])
   assert $ replicateM 1 (Just 1) == Just (l [1])
