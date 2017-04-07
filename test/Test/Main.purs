@@ -12,8 +12,4 @@ import Test.Data.List.Partial (testListPartial)
 import Test.Data.List.ZipList (testZipList)
 
 main :: forall eff. Eff (assert :: ASSERT, console :: CONSOLE | eff) Unit
-main = do
-  testList
-  testListLazy
-  testZipList
-  testListPartial
+main = testListLazy
