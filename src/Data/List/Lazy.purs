@@ -107,6 +107,7 @@ import Data.NonEmpty ((:|))
 import Data.Traversable (sequence)
 import Data.Tuple (Tuple(..))
 import Data.Unfoldable (class Unfoldable, unfoldr)
+import Control.Monad.Rec.Class as MR
 
 import Data.Foldable (foldl, foldr, foldMap, fold, intercalate, elem, notElem, find, findMap, any, all) as Exports
 import Data.Traversable (scanl, scanr) as Exports
@@ -717,6 +718,16 @@ foldM f a xs =
          Nothing -> pure a
          Just { head: b, tail: bs } ->
                        f a b >>= \a' -> foldM f a' bs
+
+
+traverseRec_ :: forall m a. MR.MonadRec m => (a -> m Unit) -> List a -> m Unit
+traverseRec_ f = MR.tailRecM go
+  where
+  go l = case uncons l of
+    Just { head: x, tail: xs} -> do
+      _ <- f x
+      pure (MR.Loop xs)
+    _ -> pure (MR.Done unit)
 
 -- | Perform a right fold lazily
 foldrLazy :: forall a b. Z.Lazy b => (a -> b -> b) -> b -> List a -> b
