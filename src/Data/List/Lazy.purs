@@ -87,6 +87,7 @@ module Data.List.Lazy
 
   , foldM
   , foldrLazy
+  , traverseRec_
 
   , module Exports
   ) where
@@ -107,6 +108,7 @@ import Data.NonEmpty ((:|))
 import Data.Traversable (sequence)
 import Data.Tuple (Tuple(..))
 import Data.Unfoldable (class Unfoldable, unfoldr)
+import Control.Monad.Rec.Class as MR
 
 import Data.Foldable (foldl, foldr, foldMap, fold, intercalate, elem, notElem, find, findMap, any, all) as Exports
 import Data.Traversable (scanl, scanr) as Exports
@@ -725,3 +727,12 @@ foldrLazy op z = go
     go xs = case step xs of
       Cons x xs' -> Z.defer \_ -> x `op` go xs'
       Nil -> z
+
+traverseRec_ :: forall m a. MR.MonadRec m => (a -> m Unit) -> List a -> m Unit
+traverseRec_ f = MR.tailRecM go
+  where
+  go = uncons >>> case _ of
+    Just { head: x, tail: xs} -> do
+      _ <- f x
+      pure (MR.Loop xs)
+    _ -> pure (MR.Done unit)

@@ -87,6 +87,7 @@ module Data.List
   , transpose
 
   , foldM
+  , traverseRec_
 
   , module Exports
   ) where
@@ -108,6 +109,7 @@ import Data.NonEmpty ((:|))
 import Data.Traversable (sequence)
 import Data.Tuple (Tuple(..))
 import Data.Unfoldable (class Unfoldable, unfoldr)
+import Control.Monad.Rec.Class as MR
 
 import Data.Foldable (foldl, foldr, foldMap, fold, intercalate, elem, notElem, find, findMap, any, all) as Exports
 import Data.Traversable (scanl, scanr) as Exports
@@ -737,3 +739,11 @@ transpose ((x : xs) : xss) =
 foldM :: forall m a b. Monad m => (a -> b -> m a) -> a -> List b -> m a
 foldM _ a Nil = pure a
 foldM f a (b : bs) = f a b >>= \a' -> foldM f a' bs
+
+traverseRec_ :: forall m a. MR.MonadRec m => (a -> m Unit) -> List a -> m Unit
+traverseRec_ f = MR.tailRecM go
+  where
+  go Nil = pure (MR.Done unit)
+  go (Cons x xs) = do
+    _ <- f x
+    pure (MR.Loop xs)
