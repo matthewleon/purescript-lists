@@ -10,7 +10,6 @@ import Control.Extend (class Extend)
 import Control.MonadPlus (class MonadPlus)
 import Control.MonadZero (class MonadZero)
 import Control.Plus (class Plus)
-
 import Data.Eq (class Eq1, eq1)
 import Data.Foldable (class Foldable, foldl, foldr, intercalate)
 import Data.Maybe (Maybe(..))
@@ -65,7 +64,46 @@ instance monoidList :: Monoid (List a) where
   mempty = Nil
 
 instance functorList :: Functor List where
-  map f = foldr (\x acc -> f x : acc) Nil
+  map = listMap
+  
+listMap :: forall a b. (a -> b) -> List a -> List b
+listMap f = startUnrolledMap naiveMapLimit
+  where
+  -- iterate the naive unrolled map up to 1000 times,
+  -- which hits up to 5000 elements
+  naiveMapLimit = 1000
+
+  startUnrolledMap :: Int -> List a -> List b
+  startUnrolledMap 0 (x : xs) = f x : chunkedRevMap xs
+  startUnrolledMap n (x1 : x2 : x3 : x4 : x5 : xs) =
+    f x1 : f x2 : f x3 : f x4 : f x5 : startUnrolledMap (n - 1) xs
+  startUnrolledMap n (x1 : x2 : x3 : x4 : xs) =
+    f x1 : f x2 : f x3 : f x4 : startUnrolledMap (n - 1) xs
+  startUnrolledMap n (x1 : x2 : x3 : xs) =
+    f x1 : f x2 : f x3 : startUnrolledMap (n - 1) xs
+  startUnrolledMap n (x1 : x2 : xs) =
+    f x1 : f x2 : startUnrolledMap (n - 1) xs
+  startUnrolledMap n (x : xs) = f x : startUnrolledMap (n - 1) xs
+
+  startUnrolledMap _ Nil = Nil
+
+  chunkedRevMap :: List a -> List b
+  chunkedRevMap = go Nil
+    where
+    go :: List (List a) -> List a -> List b
+    go chunksAcc chunk@(x1 : x2 : x3 : x4 : x5 : xs) =
+      go (chunk : chunksAcc) xs
+    go chunksAcc finalChunk =
+      reverseUnrolledMap chunksAcc $ startUnrolledMap 0 finalChunk
+
+    
+    reverseUnrolledMap :: List (List a) -> List b -> List b
+    reverseUnrolledMap ((x1 : x2 : x3 : x4 : x5 : _) : cs) acc =
+      reverseUnrolledMap cs (f x1 : (f x2 : (f x3 : (f x4 : (f x5 : acc)))))
+    -- if we pattern match on Nil, we need a Partial constraint,
+    -- which kills TCO
+    reverseUnrolledMap _ acc = acc
+      
 
 instance foldableList :: Foldable List where
   foldr f b = foldl (flip f) b <<< rev Nil
