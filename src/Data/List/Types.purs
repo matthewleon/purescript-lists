@@ -74,24 +74,23 @@ listMap f = startUnrolledMap naiveMapLimit
   naiveMapLimit = 1000
 
   startUnrolledMap :: Int -> List a -> List b
-  startUnrolledMap 0 (Cons x xs) = f x : chunkedRevMap xs
-  startUnrolledMap n (Cons x1 (Cons x2 (Cons x3 (Cons x4 (Cons x5 xs))))) =
-    f x1 : (f x2 : (f x3 : (f x4 : (f x5 : startUnrolledMap (n - 1) xs))))
-  startUnrolledMap n (Cons x1 (Cons x2 (Cons x3 (Cons x4 xs)))) =
-    f x1 : (f x2 : (f x3 : (f x4 : startUnrolledMap (n - 1) xs)))
-  startUnrolledMap n (Cons x1 (Cons x2 (Cons x3 xs))) =
-    f x1 : (f x2 : (f x3 : startUnrolledMap (n - 1) xs))
-  startUnrolledMap n (Cons x1 (Cons x2 xs)) =
-    f x1 : (f x2 : startUnrolledMap (n - 1) xs)
-  startUnrolledMap n (Cons x xs) = f x : startUnrolledMap (n - 1) xs
+  startUnrolledMap 0 (x : xs) = f x : chunkedRevMap xs
+  startUnrolledMap n (x1 : x2 : x3 : x4 : x5 : xs) =
+    f x1 : f x2 : f x3 : f x4 : f x5 : startUnrolledMap (n - 1) xs
+  startUnrolledMap n (x1 : x2 : x3 : x4 : xs) =
+    f x1 : f x2 : f x3 : f x4 : startUnrolledMap (n - 1) xs
+  startUnrolledMap n (x1 : x2 : x3 : xs) =
+    f x1 : f x2 : f x3 : startUnrolledMap (n - 1) xs
+  startUnrolledMap n (x1 : x2 : xs) =
+    f x1 : f x2 : startUnrolledMap (n - 1) xs
+  startUnrolledMap n (x : xs) = f x : startUnrolledMap (n - 1) xs
   startUnrolledMap _ Nil = Nil
 
   chunkedRevMap :: List a -> List b
   chunkedRevMap = go Nil
     where
     go :: List (List a) -> List a -> List b
-    go chunksAcc
-       chunk@(Cons x1 (Cons x2 (Cons x3 (Cons x4 (Cons x5 xs))))) =
+    go chunksAcc chunk@(x1 : x2 : x3 : x4 : x5 : xs) =
       go (chunk : chunksAcc) xs
     go chunksAcc finalChunk =
       reverseUnrolledMap chunksAcc $ startUnrolledMap 0 finalChunk
