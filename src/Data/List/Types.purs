@@ -91,15 +91,15 @@ listMap f = startUnrolledMap naiveMapLimit
   chunkedRevMap = go Nil
     where
     go :: List (List a) -> List a -> List b
-    go chunksAcc chunk@(x1 : x2 : x3 : x4 : x5 : xs) =
+    go chunksAcc chunk@(x1 : x2 : x3 :  xs) =
       go (chunk : chunksAcc) xs
     go chunksAcc finalChunk =
       reverseUnrolledMap chunksAcc $ startUnrolledMap 0 finalChunk
 
     
     reverseUnrolledMap :: List (List a) -> List b -> List b
-    reverseUnrolledMap ((x1 : x2 : x3 : x4 : x5 : _) : cs) acc =
-      reverseUnrolledMap cs (f x1 : (f x2 : (f x3 : (f x4 : (f x5 : acc)))))
+    reverseUnrolledMap ((x1 : x2 : x3 : _) : cs) acc =
+      reverseUnrolledMap cs (f x1 : f x2 : f x3 : acc)
     -- if we pattern match on Nil, we need a Partial constraint,
     -- which kills TCO
     reverseUnrolledMap _ acc = acc
