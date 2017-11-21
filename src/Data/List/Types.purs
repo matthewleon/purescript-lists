@@ -89,8 +89,7 @@ instance foldableWithIndexList :: FoldableWithIndex Int List where
     snd <<< foldr (\a (Tuple i b) -> Tuple (i + 1) (f i a b)) (Tuple 0 acc)
   foldlWithIndex f acc =
     snd <<< foldl (\(Tuple i b) a -> Tuple (i + 1) (f i b a)) (Tuple 0 acc)
-  foldMapWithIndex f =
-    snd <<< foldlWithIndex (\i acc -> append acc <<< f i) mempty
+  foldMapWithIndex f = foldlWithIndex (\i acc -> append acc <<< f i) mempty
 
 instance unfoldableList :: Unfoldable List where
   unfoldr f b = go b Nil
