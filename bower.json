@@ -23,7 +23,7 @@
     "purescript-lazy": "^3.0.0",
     "purescript-nonempty": "^4.0.0",
     "purescript-tailrec": "^3.3.0",
-    "purescript-unfoldable": "^3.0.0",
+    "purescript-unfoldable": "matthewleon/purescript-unfoldable#nats",
     "purescript-partial": "^1.0.0",
     "purescript-foldable-traversable": "^3.4.0"
   },
@@ -32,5 +32,8 @@
     "purescript-assert": "^3.0.0",
     "purescript-console": "^3.0.0",
     "purescript-math": "^2.0.0"
+  },
+  "resolutions": {
+    "purescript-unfoldable": "nats"
   }
 }

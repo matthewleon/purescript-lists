@@ -16,6 +16,7 @@ import Data.NonEmpty ((:|))
 import Data.Traversable (traverse)
 import Data.TraversableWithIndex (traverseWithIndex)
 import Data.Tuple (Tuple(..))
+import Data.Unfoldable (nats)
 import Partial.Unsafe (unsafePartial)
 import Test.Assert (ASSERT, assert)
 
@@ -29,6 +30,9 @@ testListLazy = do
   assert $ stripPrefix (Pattern (l [1])) (l [1,2]) == Just (l [2])
   assert $ stripPrefix (Pattern (l [])) (l [1]) == Just (l [1])
   assert $ stripPrefix (Pattern (l [2])) (l [1]) == Nothing
+
+  log "Unfoldable.nats is lazy"
+  assert $ take 5 nats == fromFoldable [0, 1, 2, 3, 4]
 
   log "append should be stack-safe"
   assert $ length (longList <> longList) == (2 * length longList)
