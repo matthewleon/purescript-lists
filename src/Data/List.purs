@@ -45,6 +45,7 @@ module Data.List
   , alterAt
 
   , reverse
+  , reverse'
   , concat
   , concatMap
   , filter
@@ -367,6 +368,8 @@ reverse = go Nil
   where
   go acc Nil = acc
   go acc (x : xs) = go (x : acc) xs
+
+foreign import reverse' :: List ~> List
 
 -- | Flatten a list of lists.
 -- |
